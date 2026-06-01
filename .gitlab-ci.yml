@@ -1,0 +1,80 @@
+# CI for propeller-v2-cms-vue.
+#
+# Two stages:
+#
+#   verify     — typecheck + production build. No tests yet; add a vitest
+#                stage when block-renderer tests land.
+#   mirror     — push master to GitHub so downstream consumers can install
+#                via `github:propeller-commerce/propeller-v2-cms-vue#master`.
+#                Gated on `verify` success so a broken build never overwrites
+#                a working GitHub tip.
+#
+# Required project CI/CD variables (Settings → CI/CD → Variables):
+#
+#   GITHUB_TOKEN   personal-access-token with `repo` scope on the GitHub
+#                  mirror (`propeller-commerce/propeller-v2-cms-vue`).
+#                  Masked + Protected.
+
+stages:
+  - verify
+  - mirror
+
+default:
+  image: node:20
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+
+.npm_setup: &npm_setup
+  - npm config set cache .npm --location project
+  - npm ci
+
+# ── Stage: verify ───────────────────────────────────────────────────────────
+
+typecheck:
+  stage: verify
+  before_script: *npm_setup
+  script:
+    - npm run typecheck
+
+build:
+  stage: verify
+  before_script: *npm_setup
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 day
+
+# ── Stage: mirror ───────────────────────────────────────────────────────────
+
+mirror_to_github:
+  stage: mirror
+  image:
+    name: alpine/git:latest
+    entrypoint: [""]
+  only:
+    - master
+    - main
+  before_script:
+    - git --version
+  script:
+    - echo "Mirroring to GitHub..."
+    - git config --global user.email "ci@propeller-commerce.com"
+    - git config --global user.name "GitLab CI"
+    - git remote add github https://${GITHUB_TOKEN}@github.com/propeller-commerce/propeller-v2-cms-vue.git || true
+    # GitLab clones shallow; a shallow history + thin pack against the
+    # divergent GitHub mirror causes "remote unpack failed: index-pack
+    # failed". Unshallow so the full object graph is local, do NOT fetch the
+    # GitHub remote (that is what makes git deltify the pack against objects
+    # GitHub may not have), and push a complete (--no-thin) pack.
+    - git fetch origin --unshallow || git fetch origin || true
+    - git push --no-thin github HEAD:refs/heads/master --force
+    - git push --no-thin github --tags --force
+  when: on_success
+  allow_failure: false
