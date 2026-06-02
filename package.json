@@ -1,6 +1,6 @@
 {
   "name": "propeller-v2-cms-vue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CMS page renderer + block dispatcher + adapter provider for Propeller Commerce Vue shops. Pairs with any propeller-v2-cms-adapter-* package.",
   "license": "MIT",
   "private": true,

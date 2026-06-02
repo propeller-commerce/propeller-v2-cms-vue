@@ -1,0 +1,75 @@
+---
+title: useCms
+sidebar_label: useCms
+sidebar_position: 6
+---
+
+# `useCms()`
+
+Reads the `CmsAdapter` from Vue's inject layer. Returns the adapter (or
+`null` when the provider was given `null` / no provider is in scope).
+
+```ts
+import { useCms } from 'propeller-v2-cms-vue';
+
+const cms = useCms();
+//    ^^ CmsAdapter | null
+```
+
+## When to use
+
+Client islands that need **optional** access to the adapter — e.g.
+preview banners, draft-mode toggles, "edit in CMS" links. Server data
+fetchers should construct the adapter directly and pass results into
+views.
+
+## Outside the provider
+
+If a component calling `useCms()` is not inside a `<CmsAdapterProvider>`
+(or hasn't had `provideCmsAdapter()` called above it), the hook returns
+`null`. It does **not** throw — the contract is "this shop may not have
+a CMS configured", and that's a valid state.
+
+## Patterns
+
+### Hide UI when no CMS is wired
+
+```vue
+<script setup lang="ts">
+import { useCms } from 'propeller-v2-cms-vue';
+const cms = useCms();
+</script>
+
+<template>
+  <div v-if="cms" class="preview-banner">
+    Preview mode active
+  </div>
+</template>
+```
+
+### Fetch on the client when the page slug is dynamic
+
+```vue
+<script setup lang="ts">
+import { ref, watchEffect } from 'vue';
+import { useCms, CmsPageRenderer } from 'propeller-v2-cms-vue';
+import { cmsRenderers } from '@/cms/renderers';
+
+const props = defineProps<{ slug: string }>();
+const cms = useCms();
+const page = ref<CmsPage | null>(null);
+
+watchEffect(async () => {
+  if (!cms) return;
+  page.value = await cms.getPage(props.slug);
+});
+</script>
+
+<template>
+  <CmsPageRenderer v-if="page" :page="page" :renderers="cmsRenderers" />
+</template>
+```
+
+In SSR pipelines, prefer fetching on the server route and hydrating with
+the page already loaded. Client fetches add a waterfall and skip the
+SSR cache.

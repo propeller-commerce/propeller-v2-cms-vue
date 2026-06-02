@@ -7,6 +7,26 @@ and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.
 once it reaches 1.0. Until then (the `0.x` line) the public API may change
 between minor versions; breaking changes are called out in this file.
 
+## [0.1.1] - 2026-06-02
+
+### Added
+
+- **Docusaurus documentation site** under `docs/`, deployed to
+  https://propeller-commerce.github.io/propeller-v2-cms-vue/ via a new
+  `.github/workflows/docs.yml` GitHub Action (build + GitHub Pages
+  deploy). Covers getting-started, the `<CmsAdapterProvider>` /
+  `provideCmsAdapter()` / `<CmsPageRenderer>` / `<CmsBlock>` /
+  `useCms()` APIs, and patterns for homepage fallback, catch-all
+  routing, preview mode, multi-locale, and per-block data fetching.
+- **`release_to_github` stage in `.gitlab-ci.yml`** — automatic GitHub
+  Release on every `Release X.Y.Z` push, mirroring the SDK pattern.
+
+### Notes
+
+No runtime / public-API changes — this is a tooling release that
+backfills documentation + release automation for the existing 0.1.0
+surface. Consumers do not need to update.
+
 ## [0.1.0] - 2026-06-01
 
 Initial release. A small Vue layer over the framework-agnostic

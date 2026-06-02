@@ -1,0 +1,79 @@
+---
+title: CmsPageRenderer
+sidebar_label: Page renderer
+sidebar_position: 4
+---
+
+# `<CmsPageRenderer>`
+
+Renders a `CmsPage`'s block list. Each block is dispatched through the
+`renderers` map by its `block.type` discriminator.
+
+```vue
+<script setup lang="ts">
+import { CmsPageRenderer } from 'propeller-v2-cms-vue';
+import HeroBlock from '@/components/cms/HeroBlock.vue';
+
+defineProps<{ page: CmsPage }>();
+const renderers = { hero: HeroBlock };
+</script>
+
+<template>
+  <CmsPageRenderer :page="page" :renderers="renderers" />
+</template>
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+|---|---|---|---|
+| `page` | `CmsPage` | yes | The page object returned by `adapter.getPage(slug)`. |
+| `renderers` | `Record<string, Component>` | yes | Map keyed by `block.type`. Values are Vue components. |
+| `fallback` | `Component \| null` | no | Component rendered for unknown block types. Default: `null` (skipped silently). |
+| `class` | `string` | no | Falls through to the wrapper `<div>`. |
+
+## Block component contract
+
+Each entry in `renderers` is a Vue component that receives the block
+as `:block`:
+
+```vue
+<!-- HeroBlock.vue -->
+<script setup lang="ts">
+import type { CmsBlockShape } from 'propeller-v2-cms-vue';
+defineProps<{ block: CmsBlockShape }>();
+</script>
+
+<template>
+  <section class="hero">
+    <h1>{{ block.data.headline }}</h1>
+  </section>
+</template>
+```
+
+If you'd rather destructure `block.data`, do it inside the component;
+the renderer always passes the full block.
+
+## What it does NOT do
+
+- **No client-side fetching.** The page must already be loaded; pass it
+  as a prop. Use `useCms()` if you want to fetch inside a component.
+- **No block-level loading / error states.** Blocks are synchronous
+  renders. If a block needs its own async data (a product carousel
+  hitting the commerce API), build that into the block component.
+- **No layout opinions.** Blocks render in document order inside the
+  wrapper `<div>`. Style the wrapping element via the fall-through
+  `class` attribute.
+
+## Sharing the `renderers` map
+
+Define the map once, reuse it across pages and any standalone
+`<CmsBlock>` calls:
+
+```ts
+// cms/renderers.ts
+import HeroBlock from '@/components/cms/HeroBlock.vue';
+import TextBlock from '@/components/cms/TextBlock.vue';
+
+export const cmsRenderers = { hero: HeroBlock, text: TextBlock };
+```

@@ -1,0 +1,108 @@
+---
+title: Getting started
+sidebar_position: 2
+---
+
+# Getting started
+
+## Install
+
+```bash
+npm install \
+  github:propeller-commerce/propeller-v2-cms-vue#master \
+  github:propeller-commerce/propeller-v2-core-ui#master \
+  github:propeller-commerce/propeller-sdk-v2#master
+```
+
+Plus a CMS adapter package. For Strapi:
+
+```bash
+npm install --install-links file:../propeller-v2-accelerator/packages/cms-adapter-strapi
+```
+
+(Once the adapter packages are published to npm, this becomes
+`npm install propeller-v2-cms-adapter-strapi`.)
+
+## Wire the provider
+
+At the Vue root, alongside whatever Propeller-UI plugin you already use:
+
+```vue
+<!-- src/App.vue -->
+<script setup lang="ts">
+import { CmsAdapterProvider } from 'propeller-v2-cms-vue';
+import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
+
+const adapter = createStrapiAdapter({
+  endpoint: import.meta.env.VITE_CMS_URL,
+  token: import.meta.env.VITE_CMS_TOKEN,
+});
+</script>
+
+<template>
+  <CmsAdapterProvider :adapter="adapter">
+    <RouterView />
+  </CmsAdapterProvider>
+</template>
+```
+
+Alternative — use the imperative `provideCmsAdapter()` if you prefer
+plugin-style setup:
+
+```ts
+// src/main.ts
+import { createApp } from 'vue';
+import { provideCmsAdapter } from 'propeller-v2-cms-vue';
+
+const app = createApp(App);
+provideCmsAdapter(app, adapter);
+app.mount('#app');
+```
+
+If the shop has no CMS configured, pass `null` (component) or skip the
+provide step (imperative) — `useCms()` will return `null` and any
+optional UI will gracefully hide. See
+[Patterns](/patterns#no-cms-configured).
+
+## Fetch and render a page
+
+Server-side via Vite SSR or the data-fetching layer of your choice:
+
+```vue
+<!-- src/views/CmsView.vue -->
+<script setup lang="ts">
+import { CmsPageRenderer, useCms } from 'propeller-v2-cms-vue';
+import { useRoute } from 'vue-router';
+import { onMounted, ref } from 'vue';
+import HeroBlock from '@/components/cms/HeroBlock.vue';
+import TextBlock from '@/components/cms/TextBlock.vue';
+
+const route = useRoute();
+const cms = useCms();
+const page = ref<CmsPage | null>(null);
+
+onMounted(async () => {
+  if (!cms) return;
+  page.value = await cms.getPage(route.params.slug as string);
+});
+
+const renderers = { hero: HeroBlock, text: TextBlock };
+</script>
+
+<template>
+  <CmsPageRenderer v-if="page" :page="page" :renderers="renderers" />
+  <NotFoundView v-else-if="page === null" />
+</template>
+```
+
+In production SSR pipelines the fetch happens on the server before the
+component mounts; the pattern above is the client-only fallback.
+
+## Read next
+
+- **[Provider](/provider)** — the `<CmsAdapterProvider>` /
+  `provideCmsAdapter()` APIs.
+- **[Page renderer](/page-renderer)** — the `<CmsPageRenderer>` API.
+- **[Block dispatcher](/block)** — `<CmsBlock>` for individual blocks.
+- **[Patterns](/patterns)** — homepage fallback, preview mode,
+  no-CMS shops, multi-locale.
