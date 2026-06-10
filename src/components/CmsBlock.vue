@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { CmsBlock as CmsBlockShape } from 'propeller-v2-core-ui';
+import type { CmsBlock as CmsBlockShape } from '@propeller-commerce/propeller-v2-core-ui';
 
 export type CmsBlockRenderer = (block: CmsBlockShape) => unknown;
 

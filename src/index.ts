@@ -26,7 +26,7 @@ export type {
   CmsMenuItem,
   CmsGlobals,
   CmsFetchOptions,
-} from 'propeller-v2-core-ui';
+} from '@propeller-commerce/propeller-v2-core-ui';
 
 // ── Composables ─────────────────────────────────────────────────────────────
 export {

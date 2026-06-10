@@ -1,5 +1,5 @@
 import { inject, provide, type InjectionKey } from 'vue';
-import type { CmsAdapter } from 'propeller-v2-core-ui';
+import type { CmsAdapter } from '@propeller-commerce/propeller-v2-core-ui';
 
 /**
  * Symbol-keyed injection — never collides with consumer keys.

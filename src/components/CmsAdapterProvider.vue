@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CmsAdapter } from 'propeller-v2-core-ui';
+import type { CmsAdapter } from '@propeller-commerce/propeller-v2-core-ui';
 import { provideCmsAdapter } from '../composables/cmsAdapter';
 
 const props = defineProps<{

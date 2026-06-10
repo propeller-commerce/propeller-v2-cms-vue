@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CmsPage } from 'propeller-v2-core-ui';
+import type { CmsPage } from '@propeller-commerce/propeller-v2-core-ui';
 import CmsBlock from './CmsBlock.vue';
 
 withDefaults(
