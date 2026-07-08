@@ -1,6 +1,6 @@
 {
   "name": "@propeller-commerce/propeller-v2-cms-vue",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "CMS page renderer + block dispatcher + adapter provider for Propeller Commerce Vue shops. Pairs with any propeller-v2-cms-adapter-* package.",
   "license": "MIT",
   "type": "module",
@@ -39,7 +39,7 @@
     "@types/node": "^20",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vue/tsconfig": "^0.9.1",
-    "@propeller-commerce/propeller-sdk-v2": "^0.11.1",
+    "@propeller-commerce/propeller-sdk-v2": "^0.12.0",
     "@propeller-commerce/propeller-v2-core-ui": "^0.2.4",
     "typescript": "~5.9",
     "vite": "^7",

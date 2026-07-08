@@ -7,6 +7,13 @@ and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.
 once it reaches 1.0. Until then (the `0.x` line) the public API may change
 between minor versions; breaking changes are called out in this file.
 
+## [0.1.2] - 2026-07-08
+
+### Changed
+
+- Bumped the `@propeller-commerce/propeller-sdk-v2` dev dependency to `^0.12.0`
+  to build and test against the SDK's 0.12.0 release. No API change.
+
 ## [0.1.1] - 2026-06-02
 
 ### Added
