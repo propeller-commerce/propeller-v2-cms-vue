@@ -7,6 +7,18 @@ and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.
 once it reaches 1.0. Until then (the `0.x` line) the public API may change
 between minor versions; breaking changes are called out in this file.
 
+## [0.1.4] - 2026-07-24
+
+### Added
+
+- `<CmsBlock>` / `<CmsPageRenderer>` now render **typed** blocks
+  (`CmsTypedBlock`, discriminated by `_type` with spread fields) in addition to
+  the flat `{ type, data }` adapter blocks. The renderer resolves the
+  discriminator as `_type ?? type` and passes the whole block through as
+  `:block`, so a `CmsProvider.getPage` → `CmsRichPage` result renders directly.
+  `<CmsPageRenderer>` `page` prop now accepts `CmsPage | CmsRichPage`.
+  Backward-compatible: flat blocks keyed by `type` still work unchanged.
+
 ## [0.1.3] - 2026-07-24
 
 ### Changed
