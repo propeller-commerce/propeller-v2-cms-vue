@@ -7,6 +7,17 @@ and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.
 once it reaches 1.0. Until then (the `0.x` line) the public API may change
 between minor versions; breaking changes are called out in this file.
 
+## [0.1.3] - 2026-07-24
+
+### Changed
+
+- Widened the `@propeller-commerce/propeller-v2-core-ui` peer range to
+  `>=0.2.4 <0.4` so the package installs cleanly alongside core-ui 0.3.x
+  (as pulled in by `propeller-v2-vue-ui` 0.4.x). All core-ui imports are
+  type-only and the CMS contract types are unchanged across 0.2→0.3, so this
+  is a peer-range fix only — no runtime or API change. Dev deps bumped to
+  core-ui `^0.3.1` / SDK `^0.13.0` to build against the current line.
+
 ## [0.1.2] - 2026-07-08
 
 ### Changed
