@@ -7,6 +7,25 @@ and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.
 once it reaches 1.0. Until then (the `0.x` line) the public API may change
 between minor versions; breaking changes are called out in this file.
 
+## [0.1.5] - 2026-08-05
+
+### Changed
+
+- **Widened the `propeller-v2-core-ui` peer range to `>=0.2.4`** (was
+  `>=0.2.4 <0.4`). The upper bound forced npm to install a second, older
+  core-ui at the tree root whenever another package required a newer one, and
+  an app importing core-ui directly then resolved that older copy — reaching
+  for an export that only exists in the newer version and failing the build.
+
+  The bound was never protecting anything: this package imports **only types**
+  from core-ui (`CmsAdapter`, `CmsBlock`, `CmsPage`, `CmsRichPage`,
+  `CmsMenuItem`, `CmsGlobals`, `CmsFetchOptions`), all of which are unchanged
+  across every 0.x release in the range. Dropping the ceiling lets one core-ui
+  satisfy the whole tree. Removing it entirely, rather than raising it to the
+  next minor, stops this recurring each time core-ui ships a feature.
+
+  Matches `propeller-v2-cms-react` 0.1.5.
+
 ## [0.1.4] - 2026-07-24
 
 ### Added
