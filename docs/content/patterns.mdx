@@ -1,0 +1,144 @@
+---
+title: Patterns
+sidebar_position: 7
+---
+
+# Patterns
+
+Recipes that come up in real shops.
+
+## Homepage fallback
+
+The Propeller convention for a CMS-driven homepage: if the adapter
+returns `null`, render a built-in `<HomeFallback>` instead. This lets a
+shop launch without a CMS and add one later without touching the
+homepage route.
+
+```vue
+<!-- src/views/HomeView.vue -->
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { CmsPageRenderer, useCms } from 'propeller-v2-cms-vue';
+import HomeFallback from '@/components/HomeFallback.vue';
+import { cmsRenderers } from '@/cms/renderers';
+
+const cms = useCms();
+const page = ref<CmsPage | null>(null);
+const loaded = ref(false);
+
+onMounted(async () => {
+  if (cms) page.value = await cms.getPage('home');
+  loaded.value = true;
+});
+</script>
+
+<template>
+  <template v-if="!loaded">
+    <!-- skeleton -->
+  </template>
+  <CmsPageRenderer v-else-if="page" :page="page" :renderers="cmsRenderers" />
+  <HomeFallback v-else />
+</template>
+```
+
+The non-homepage CMS catch-all route uses the opposite convention: if
+the adapter returns `null`, navigate to a `not-found` view. There is no
+generic "page-not-found-in-CMS" fallback.
+
+## Catch-all route
+
+```ts
+// src/router/index.ts
+{
+  path: '/:slug+',
+  name: 'cms-page',
+  component: () => import('@/views/CmsView.vue'),
+},
+```
+
+```vue
+<!-- src/views/CmsView.vue -->
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { CmsPageRenderer, useCms } from 'propeller-v2-cms-vue';
+import { cmsRenderers } from '@/cms/renderers';
+
+const route = useRoute();
+const router = useRouter();
+const cms = useCms();
+const page = ref<CmsPage | null>(null);
+
+onMounted(async () => {
+  if (!cms) { router.replace({ name: 'not-found' }); return; }
+  const slug = (route.params.slug as string[]).join('/');
+  const result = await cms.getPage(slug);
+  if (!result) { router.replace({ name: 'not-found' }); return; }
+  page.value = result;
+});
+</script>
+
+<template>
+  <CmsPageRenderer v-if="page" :page="page" :renderers="cmsRenderers" />
+</template>
+```
+
+## No CMS configured
+
+A shop without a CMS still wraps the tree with `<CmsAdapterProvider
+:adapter="null">` (or omits the provider entirely) so `useCms()` calls
+elsewhere are safe. The homepage gets `<HomeFallback>`, and the
+catch-all route either isn't mounted at all or routes to 404 for every
+slug.
+
+## Preview mode
+
+The Strapi adapter (and most others) accept a `preview: true` option.
+Wire two adapter instances — one preview, one published — and pick
+which one to use based on a preview cookie / query param:
+
+```ts
+// src/cms.ts
+import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
+
+const publishedAdapter = createStrapiAdapter({ endpoint, preview: false });
+const previewAdapter   = createStrapiAdapter({ endpoint, preview: true });
+
+export function getAdapter(isPreview: boolean) {
+  return isPreview ? previewAdapter : publishedAdapter;
+}
+```
+
+## Multi-locale
+
+Pass `locale` through to `adapter.getPage`:
+
+```ts
+const page = await cms.getPage(slug, { locale: currentLocale.value });
+```
+
+The adapter is responsible for falling back to a default locale if the
+exact one isn't published; the renderer just consumes whatever shape
+comes back.
+
+## Per-block data fetching
+
+Block components are free to fetch their own data — `<CmsPageRenderer>`
+does **not** orchestrate child data:
+
+```vue
+<!-- ProductCarouselBlock.vue -->
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useProducts } from '@/composables/useProducts';
+
+defineProps<{ block: CmsBlockShape }>();
+const products = ref<Product[]>([]);
+
+onMounted(async () => {
+  products.value = await useProducts(props.block.data.skus);
+});
+</script>
+```
+
+This keeps the renderer pure and lets blocks evolve independently.

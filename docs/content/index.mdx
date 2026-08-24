@@ -1,0 +1,88 @@
+---
+title: Introduction
+slug: /
+---
+
+# propeller-v2-cms-vue
+
+CMS page renderer + block dispatcher + adapter provider for Propeller
+Commerce Vue shops.
+
+This package is the **rendering + provider layer**. The actual CMS adapter
+(Strapi, Sanity, etc.) ships as a separate `propeller-v2-cms-adapter-*`
+package, which you install alongside this one. The framework-agnostic
+`CmsAdapter` contract lives in
+[`propeller-v2-core-ui`](https://propeller-commerce.github.io/propeller-v2-core-ui/).
+
+## What's here
+
+- **[`<CmsAdapterProvider>` + `provideCmsAdapter()`](/provider)** — wire
+  a `CmsAdapter` instance into the Vue tree.
+- **[`useCms()`](/use-cms)** — read the adapter from inject, for islands
+  that need optional CMS access.
+- **[`<CmsPageRenderer>`](/page-renderer)** — render a `CmsPage`'s block
+  list with a per-block renderer map.
+- **[`<CmsBlock>`](/block)** — single-block dispatcher; the building block
+  the page renderer calls per item.
+
+## Mode-of-operation
+
+```vue
+<!-- App.vue -->
+<script setup lang="ts">
+import { CmsAdapterProvider } from 'propeller-v2-cms-vue';
+import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
+
+const adapter = createStrapiAdapter({ endpoint: import.meta.env.VITE_CMS_URL });
+</script>
+
+<template>
+  <CmsAdapterProvider :adapter="adapter">
+    <RouterView />
+  </CmsAdapterProvider>
+</template>
+```
+
+```vue
+<!-- A CMS page -->
+<script setup lang="ts">
+import { CmsPageRenderer } from 'propeller-v2-cms-vue';
+import HeroBlock from '@/components/cms/HeroBlock.vue';
+import TextBlock from '@/components/cms/TextBlock.vue';
+
+defineProps<{ page: CmsPage }>();
+
+const renderers = { hero: HeroBlock, text: TextBlock };
+</script>
+
+<template>
+  <CmsPageRenderer :page="page" :renderers="renderers" />
+</template>
+```
+
+## Why no built-in blocks?
+
+Block component styling, layout, and content shape vary too much between
+shops to share. This package ships the **dispatcher**, the renderer, and
+the provider — not the blocks themselves. Register whatever your CMS
+emits via the `renderers` map.
+
+The accelerator shop templates ship a small default block set
+(`HeroBlock.vue`, `TextBlock.vue`, `ImageBlock.vue`,
+`ProductCarouselBlock.vue`) as a starting point shops can edit or replace
+freely.
+
+## Pair with
+
+- [`propeller-v2-core-ui`](https://propeller-commerce.github.io/propeller-v2-core-ui/)
+  — the framework-agnostic `CmsAdapter` contract.
+- [`propeller-v2-vue-ui`](https://propeller-commerce.github.io/propeller-v2-vue-ui/)
+  — the commerce components (cart, checkout, catalog).
+- [`propeller-v2-cms-react`](https://propeller-commerce.github.io/propeller-v2-cms-react/)
+  — the React mirror of this package.
+
+## Status
+
+The package is **pre-1.0** (`0.x`). Public API may change between minor
+versions until it stabilises; breaking changes are called out in
+[the changelog](/changelog).

@@ -1,0 +1,66 @@
+---
+title: CmsBlock
+sidebar_label: Block
+sidebar_position: 5
+---
+
+# `<CmsBlock>`
+
+The single-block dispatcher used internally by
+[`<CmsPageRenderer>`](/page-renderer). Exported so consumers can render a
+block in isolation — useful for previews, partials, or CMS-driven
+snippets embedded inside a non-CMS route.
+
+```vue
+<script setup lang="ts">
+import { CmsBlock } from 'propeller-v2-cms-vue';
+import HeroBlock from '@/components/cms/HeroBlock.vue';
+
+defineProps<{ block: CmsBlockShape }>();
+const renderers = { hero: HeroBlock };
+</script>
+
+<template>
+  <CmsBlock :block="block" :renderers="renderers" />
+</template>
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+|---|---|---|---|
+| `block` | `CmsBlockShape` | yes | The block to render. |
+| `renderers` | `Record<string, Component>` | yes | Same map shape as `CmsPageRenderer`. |
+| `fallback` | `Component \| null` | no | Rendered when `block.type` is not in `renderers`. |
+
+## When to use this directly
+
+Most shops won't — `<CmsPageRenderer>` is the normal entry point.
+Reach for `<CmsBlock>` directly when:
+
+- You want to **inline** a single CMS block inside a non-CMS view
+  (e.g. a promotional `hero` block on the cart confirmation page).
+- You're building **preview tooling** that lets editors swap one
+  block at a time.
+- You're writing **unit tests** for a single block's rendering.
+
+## Sharing `renderers` maps
+
+A practical pattern is to define the `renderers` map once and use it
+both in the page renderer and in any standalone `<CmsBlock>` usages:
+
+```ts
+// cms/renderers.ts
+import HeroBlock from '@/components/cms/HeroBlock.vue';
+import TextBlock from '@/components/cms/TextBlock.vue';
+
+export const cmsRenderers = { hero: HeroBlock, text: TextBlock };
+```
+
+```vue
+<!-- CmsView.vue -->
+<CmsPageRenderer :page="page" :renderers="cmsRenderers" />
+
+<!-- CartConfirmView.vue -->
+<CmsBlock :block="promoBlock" :renderers="cmsRenderers" />
+```

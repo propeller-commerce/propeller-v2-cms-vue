@@ -1,0 +1,87 @@
+---
+title: CmsAdapterProvider
+sidebar_label: Provider
+sidebar_position: 3
+---
+
+# Provider
+
+Two ways to wire a `CmsAdapter` into the Vue tree:
+
+- **`<CmsAdapterProvider>`** — declarative wrapper component.
+- **`provideCmsAdapter()`** — imperative helper for `main.ts`-style setup.
+
+Both end up at the same `inject`able key (`CmsAdapterKey`) that
+[`useCms()`](/use-cms) reads.
+
+```ts
+import {
+  CmsAdapterProvider,
+  provideCmsAdapter,
+  CmsAdapterKey,
+} from 'propeller-v2-cms-vue';
+```
+
+## `<CmsAdapterProvider>`
+
+```vue
+<CmsAdapterProvider :adapter="adapter">
+  <slot />
+</CmsAdapterProvider>
+```
+
+Props:
+
+| Prop | Type | Required | Notes |
+|---|---|---|---|
+| `adapter` | `CmsAdapter \| null` | yes | Pass `null` for shops without a CMS. |
+
+Single default slot. Renders its slot inside a single wrapping `<div>`
+with no class (use a `class` attribute fall-through if you need to style
+it).
+
+## `provideCmsAdapter()`
+
+```ts
+provideCmsAdapter(target: App | ComponentInternalInstance, adapter: CmsAdapter | null): void
+```
+
+Imperative variant. Pass either the app instance (typical) or a setup
+component instance:
+
+```ts
+import { createApp } from 'vue';
+import { provideCmsAdapter } from 'propeller-v2-cms-vue';
+import App from './App.vue';
+import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
+
+const app = createApp(App);
+provideCmsAdapter(app, createStrapiAdapter({ endpoint: '…' }));
+app.mount('#app');
+```
+
+Use this when:
+
+- You want CMS wiring colocated with the rest of your bootstrap in
+  `main.ts` instead of `App.vue`.
+- You're integrating with Nuxt or another framework that has its own
+  app-level plugin pattern.
+
+## Passing `null`
+
+A shop that wants to ship without a CMS can wire `null`:
+
+```vue
+<CmsAdapterProvider :adapter="null">
+  <slot />
+</CmsAdapterProvider>
+```
+
+`useCms()` then returns `null`, and any optional UI guarded by
+`if (!cms) return null` quietly disappears.
+
+## `CmsAdapterKey`
+
+The `InjectionKey<CmsAdapter | null>` used internally. Exposed so
+consumers writing custom plugins can `provide(CmsAdapterKey, …)`
+themselves if they need to bypass the helpers above. Most shops don't.
