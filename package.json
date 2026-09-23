@@ -1,6 +1,10 @@
 {
   "name": "@propeller-commerce/propeller-v2-cms-vue",
   "version": "0.1.5",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/propeller-commerce/propeller-v2-cms-vue.git"
+  },
   "description": "CMS page renderer + block dispatcher + adapter provider for Propeller Commerce Vue shops. Pairs with any propeller-v2-cms-adapter-* package.",
   "license": "MIT",
   "type": "module",
