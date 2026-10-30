@@ -9,7 +9,7 @@ sidebar_position: 3
 Two ways to wire a `CmsAdapter` into the Vue tree:
 
 - **`<CmsAdapterProvider>`** — declarative wrapper component.
-- **`provideCmsAdapter()`** — imperative helper for `main.ts`-style setup.
+- **`provideCmsAdapter()`** — imperative helper for a root `setup()`.
 
 Both end up at the same `inject`able key (`CmsAdapterKey`) that
 [`useCms()`](/use-cms) reads.
@@ -19,7 +19,7 @@ import {
   CmsAdapterProvider,
   provideCmsAdapter,
   CmsAdapterKey,
-} from 'propeller-v2-cms-vue';
+} from '@propeller-commerce/propeller-v2-cms-vue';
 ```
 
 ## `<CmsAdapterProvider>`
@@ -43,27 +43,28 @@ it).
 ## `provideCmsAdapter()`
 
 ```ts
-provideCmsAdapter(target: App | ComponentInternalInstance, adapter: CmsAdapter | null): void
+provideCmsAdapter(adapter: CmsAdapter | null): void
 ```
 
-Imperative variant. Pass either the app instance (typical) or a setup
-component instance:
+Imperative variant. Wraps Vue's `provide()`, so call it inside a
+component's `setup()` (typically the root component):
 
-```ts
-import { createApp } from 'vue';
-import { provideCmsAdapter } from 'propeller-v2-cms-vue';
-import App from './App.vue';
-import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
+```vue
+<script setup lang="ts">
+import { provideCmsAdapter } from '@propeller-commerce/propeller-v2-cms-vue';
+import { adapter } from '@/lib/cms';
 
-const app = createApp(App);
-provideCmsAdapter(app, createStrapiAdapter({ endpoint: '…' }));
-app.mount('#app');
+provideCmsAdapter(adapter);
+</script>
 ```
+
+For app-level wiring in `main.ts`, use the exported key directly:
+`app.provide(CmsAdapterKey, adapter)`.
 
 Use this when:
 
-- You want CMS wiring colocated with the rest of your bootstrap in
-  `main.ts` instead of `App.vue`.
+- You want to wire the adapter from script instead of wrapping the
+  template in `<CmsAdapterProvider>`.
 - You're integrating with Nuxt or another framework that has its own
   app-level plugin pattern.
 

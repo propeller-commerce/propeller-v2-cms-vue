@@ -11,7 +11,7 @@ Renders a `CmsPage`'s block list. Each block is dispatched through the
 
 ```vue
 <script setup lang="ts">
-import { CmsPageRenderer } from 'propeller-v2-cms-vue';
+import { CmsPageRenderer } from '@propeller-commerce/propeller-v2-cms-vue';
 import HeroBlock from '@/components/cms/HeroBlock.vue';
 
 defineProps<{ page: CmsPage }>();
@@ -40,7 +40,7 @@ as `:block`:
 ```vue
 <!-- HeroBlock.vue -->
 <script setup lang="ts">
-import type { CmsBlockShape } from 'propeller-v2-cms-vue';
+import type { CmsBlockShape } from '@propeller-commerce/propeller-v2-cms-vue';
 defineProps<{ block: CmsBlockShape }>();
 </script>
 

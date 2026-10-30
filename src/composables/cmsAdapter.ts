@@ -4,13 +4,10 @@ import type { CmsAdapter } from '@propeller-commerce/propeller-v2-core-ui';
 /**
  * Symbol-keyed injection — never collides with consumer keys.
  *
- * Wire ONCE at the app root, alongside the propellerVue plugin:
+ * Wire ONCE in the root component's setup(), alongside the propellerVue plugin:
  *
- *   import { provideCmsAdapter } from 'propeller-v2-cms-vue';
- *   const strapiAdapter = createStrapiAdapter({ endpoint: ... });
- *
- *   // Either in a setup() at the root, or via app.runWithContext:
- *   provideCmsAdapter(strapiAdapter);
+ *   import { provideCmsAdapter } from '@propeller-commerce/propeller-v2-cms-vue';
+ *   provideCmsAdapter(adapter);
  *
  * Pass `null` for shops without a CMS — the catch-all CMS route returns 404
  * and the homepage renders its `<HomeFallback>`. Nothing breaks downstream.

@@ -7,6 +7,26 @@ and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.
 once it reaches 1.0. Until then (the `0.x` line) the public API may change
 between minor versions; breaking changes are called out in this file.
 
+## [0.1.6] - 2026-10-30
+
+### Changed
+
+- **Docs use the published package names (PWP-1087).** README and docs-site
+  install and import lines now name `@propeller-commerce/propeller-v2-cms-vue`,
+  `@propeller-commerce/propeller-v2-core-ui` and
+  `@propeller-commerce/propeller-sdk-v2`, installed from npm. The README
+  gains an Install section.
+- **No unpublished adapters, no sign-in links (PWP-1088).** The README and docs
+  site no longer tell you to install or import a Strapi adapter package that is
+  not on npm; they point at the `CmsAdapter` contract and the CMS providers in
+  the public Vue boilerplate. The README link to the adapter repository is
+  gone, the other links go to the public GitHub repositories, the package
+  description no longer mentions adapter packages, and `package.json` gains a
+  `repository` field.
+- **`provideCmsAdapter()` docs match its signature.** It takes only the
+  adapter and is called from a component's `setup()`; app-level wiring uses
+  `app.provide(CmsAdapterKey, adapter)`.
+
 ## [0.1.5] - 2026-08-05
 
 ### Changed

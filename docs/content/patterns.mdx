@@ -18,7 +18,7 @@ homepage route.
 <!-- src/views/HomeView.vue -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { CmsPageRenderer, useCms } from 'propeller-v2-cms-vue';
+import { CmsPageRenderer, useCms } from '@propeller-commerce/propeller-v2-cms-vue';
 import HomeFallback from '@/components/HomeFallback.vue';
 import { cmsRenderers } from '@/cms/renderers';
 
@@ -61,7 +61,7 @@ generic "page-not-found-in-CMS" fallback.
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { CmsPageRenderer, useCms } from 'propeller-v2-cms-vue';
+import { CmsPageRenderer, useCms } from '@propeller-commerce/propeller-v2-cms-vue';
 import { cmsRenderers } from '@/cms/renderers';
 
 const route = useRoute();
@@ -93,16 +93,15 @@ slug.
 
 ## Preview mode
 
-The Strapi adapter (and most others) accept a `preview: true` option.
-Wire two adapter instances — one preview, one published — and pick
-which one to use based on a preview cookie / query param:
+If your adapter supports a preview (draft) flag, wire two adapter
+instances — one preview, one published — and pick which one to use based on a preview cookie / query param:
 
 ```ts
 // src/cms.ts
-import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
+import { createMyCmsAdapter } from './my-cms-adapter';
 
-const publishedAdapter = createStrapiAdapter({ endpoint, preview: false });
-const previewAdapter   = createStrapiAdapter({ endpoint, preview: true });
+const publishedAdapter = createMyCmsAdapter({ endpoint, preview: false });
+const previewAdapter   = createMyCmsAdapter({ endpoint, preview: true });
 
 export function getAdapter(isPreview: boolean) {
   return isPreview ? previewAdapter : publishedAdapter;

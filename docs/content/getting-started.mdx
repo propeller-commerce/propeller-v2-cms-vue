@@ -9,19 +9,16 @@ sidebar_position: 2
 
 ```bash
 npm install \
-  github:propeller-commerce/propeller-v2-cms-vue#master \
-  github:propeller-commerce/propeller-v2-core-ui#master \
-  github:propeller-commerce/propeller-sdk-v2#master
+  @propeller-commerce/propeller-v2-cms-vue \
+  @propeller-commerce/propeller-v2-core-ui \
+  @propeller-commerce/propeller-sdk-v2
 ```
 
-Plus a CMS adapter package. For Strapi:
-
-```bash
-npm install --install-links file:../propeller-v2-accelerator/packages/cms-adapter-strapi
-```
-
-(Once the adapter packages are published to npm, this becomes
-`npm install propeller-v2-cms-adapter-strapi`.)
+There is no CMS adapter to install from npm. Write one against the
+[`CmsAdapter` contract](https://propeller-commerce.github.io/propeller-v2-core-ui/types#cmsadapter-contract)
+for your CMS, or start from the Strapi and Prepr providers in the
+[Propeller Vue boilerplate](https://github.com/propeller-commerce/propeller-v2-vue-boilerplate)'s
+`frontend/src/lib/cms/providers`.
 
 ## Wire the provider
 
@@ -30,13 +27,8 @@ At the Vue root, alongside whatever Propeller-UI plugin you already use:
 ```vue
 <!-- src/App.vue -->
 <script setup lang="ts">
-import { CmsAdapterProvider } from 'propeller-v2-cms-vue';
-import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
-
-const adapter = createStrapiAdapter({
-  endpoint: import.meta.env.VITE_CMS_URL,
-  token: import.meta.env.VITE_CMS_TOKEN,
-});
+import { CmsAdapterProvider } from '@propeller-commerce/propeller-v2-cms-vue';
+import { adapter } from '@/lib/cms'; // your CmsAdapter implementation
 </script>
 
 <template>
@@ -46,17 +38,17 @@ const adapter = createStrapiAdapter({
 </template>
 ```
 
-Alternative — use the imperative `provideCmsAdapter()` if you prefer
-plugin-style setup:
+Alternative — call the imperative `provideCmsAdapter()` from your root
+component's `setup()`:
 
-```ts
-// src/main.ts
-import { createApp } from 'vue';
-import { provideCmsAdapter } from 'propeller-v2-cms-vue';
+```vue
+<!-- src/App.vue -->
+<script setup lang="ts">
+import { provideCmsAdapter } from '@propeller-commerce/propeller-v2-cms-vue';
+import { adapter } from '@/lib/cms';
 
-const app = createApp(App);
-provideCmsAdapter(app, adapter);
-app.mount('#app');
+provideCmsAdapter(adapter);
+</script>
 ```
 
 If the shop has no CMS configured, pass `null` (component) or skip the
@@ -71,7 +63,7 @@ Server-side via Vite SSR or the data-fetching layer of your choice:
 ```vue
 <!-- src/views/CmsView.vue -->
 <script setup lang="ts">
-import { CmsPageRenderer, useCms } from 'propeller-v2-cms-vue';
+import { CmsPageRenderer, useCms } from '@propeller-commerce/propeller-v2-cms-vue';
 import { useRoute } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import HeroBlock from '@/components/cms/HeroBlock.vue';

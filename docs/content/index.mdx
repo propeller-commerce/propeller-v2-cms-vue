@@ -8,10 +8,12 @@ slug: /
 CMS page renderer + block dispatcher + adapter provider for Propeller
 Commerce Vue shops.
 
-This package is the **rendering + provider layer**. The actual CMS adapter
-(Strapi, Sanity, etc.) ships as a separate `propeller-v2-cms-adapter-*`
-package, which you install alongside this one. The framework-agnostic
-`CmsAdapter` contract lives in
+This package is the **rendering + provider layer**. There is no CMS
+adapter to install from npm: write one for your CMS, or start from the
+Strapi and Prepr providers in the
+[Propeller Vue boilerplate](https://github.com/propeller-commerce/propeller-v2-vue-boilerplate)'s
+`frontend/src/lib/cms/providers`. The framework-agnostic `CmsAdapter`
+contract lives in
 [`propeller-v2-core-ui`](https://propeller-commerce.github.io/propeller-v2-core-ui/).
 
 ## What's here
@@ -30,10 +32,8 @@ package, which you install alongside this one. The framework-agnostic
 ```vue
 <!-- App.vue -->
 <script setup lang="ts">
-import { CmsAdapterProvider } from 'propeller-v2-cms-vue';
-import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
-
-const adapter = createStrapiAdapter({ endpoint: import.meta.env.VITE_CMS_URL });
+import { CmsAdapterProvider } from '@propeller-commerce/propeller-v2-cms-vue';
+import { adapter } from '@/lib/cms'; // your CmsAdapter implementation
 </script>
 
 <template>
@@ -46,7 +46,7 @@ const adapter = createStrapiAdapter({ endpoint: import.meta.env.VITE_CMS_URL });
 ```vue
 <!-- A CMS page -->
 <script setup lang="ts">
-import { CmsPageRenderer } from 'propeller-v2-cms-vue';
+import { CmsPageRenderer } from '@propeller-commerce/propeller-v2-cms-vue';
 import HeroBlock from '@/components/cms/HeroBlock.vue';
 import TextBlock from '@/components/cms/TextBlock.vue';
 

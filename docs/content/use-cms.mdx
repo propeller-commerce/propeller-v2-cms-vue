@@ -10,7 +10,7 @@ Reads the `CmsAdapter` from Vue's inject layer. Returns the adapter (or
 `null` when the provider was given `null` / no provider is in scope).
 
 ```ts
-import { useCms } from 'propeller-v2-cms-vue';
+import { useCms } from '@propeller-commerce/propeller-v2-cms-vue';
 
 const cms = useCms();
 //    ^^ CmsAdapter | null
@@ -36,7 +36,7 @@ a CMS configured", and that's a valid state.
 
 ```vue
 <script setup lang="ts">
-import { useCms } from 'propeller-v2-cms-vue';
+import { useCms } from '@propeller-commerce/propeller-v2-cms-vue';
 const cms = useCms();
 </script>
 
@@ -52,7 +52,7 @@ const cms = useCms();
 ```vue
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
-import { useCms, CmsPageRenderer } from 'propeller-v2-cms-vue';
+import { useCms, CmsPageRenderer } from '@propeller-commerce/propeller-v2-cms-vue';
 import { cmsRenderers } from '@/cms/renderers';
 
 const props = defineProps<{ slug: string }>();
